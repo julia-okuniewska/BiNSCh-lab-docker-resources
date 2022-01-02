@@ -3,20 +3,18 @@ import subprocess
 
 # Modify variables below:
 INDEX_NUMBER = 123456
-EXERCISE_NAME = "Docker_Memory_01"
+EXERCISE_NAME = "Docker_CPU_01"
 # to avoid use of " it is possible to pass value as
 # --option <value> instead of --option="<value>"
 options = ""
 # ----------------------
 
 
-CONTAINER_NAME = "docker-memory-container"
+CONTAINER_NAME = "docker-cpu-container"
 
 
 def parse_inspect_output(output: dict) -> str:
-    return f"""Is container OOM Killed = {output["State"]["OOMKilled"]}
-RAM Memory Bytes Allocated = {output["HostConfig"]["Memory"]}
-RAM Memory Bytes Allocated = {output["HostConfig"]["MemorySwap"]}"""
+    return f'CPU Shares used = {output["HostConfig"]["NanoCpus"]/(1*10e8)}'
 
 
 def cleanup() -> None:
@@ -26,13 +24,14 @@ def cleanup() -> None:
         print("Docker container cleanup completed successfully")
 
 
-run_command = f"docker run {options} --name {CONTAINER_NAME} docker-memory"
+run_command = f"docker run {options} --name {CONTAINER_NAME} docker-cpu"
 print(f"Running command: {run_command}")
 run_result = subprocess.run(run_command, capture_output=True)
 if run_result.returncode != 0:
     print(f"Cleaning up previous {CONTAINER_NAME} container")
     cleanup()
     run_result = subprocess.run(run_command, capture_output=True)
+
 
 print("Inspecting container")
 inspect_command = [f"docker", "container", "inspect", CONTAINER_NAME]
