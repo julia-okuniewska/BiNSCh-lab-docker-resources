@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-import sys, time
+import time
 
-
-print("printowanie bledow", file=sys.stderr)
 
 longstring = []
 for x in range(17):
