@@ -19,23 +19,23 @@ def parse_inspect_output(output: dict) -> str:
 
 def cleanup() -> None:
     cleanup_command = f"docker container rm {CONTAINER_NAME}"
-    cleanup_result = subprocess.run(cleanup_command)
+    cleanup_result = subprocess.run(cleanup_command, shell=True)
     if cleanup_result.returncode == 0:
         print("Docker container cleanup completed successfully")
 
 
 run_command = f"docker run {options} --name {CONTAINER_NAME} docker-cpu"
 print(f"Running command: {run_command}")
-run_result = subprocess.run(run_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+run_result = subprocess.run(run_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 if run_result.returncode != 0:
     print(f"Cleaning up previous {CONTAINER_NAME} container")
     cleanup()
-    run_result = subprocess.run(run_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    run_result = subprocess.run(run_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 
 print("Inspecting container")
-inspect_command = [f"docker", "container", "inspect", CONTAINER_NAME]
-inspect_raw_result = subprocess.run(inspect_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+inspect_command = f"docker container inspect {CONTAINER_NAME}"
+inspect_raw_result = subprocess.run(inspect_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 if inspect_raw_result.returncode != 0:
     raise Exception("Container did not run successfully! Check options value!")
 inspect_result = parse_inspect_output(json.loads(inspect_raw_result.stdout)[0])
